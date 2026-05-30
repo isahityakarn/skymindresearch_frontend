@@ -60,13 +60,13 @@ const Sidebar = ({
         {/* Navigation Links */}
         <nav className="d-flex flex-column border border-secondary border-opacity-25 rounded-3 overflow-hidden bg-black bg-opacity-40">
           {[
-            { id: 'dashboard', label: 'Dashboard', icon: 'settings' },
-            { id: 'survey_record', label: 'Survey Record', icon: 'settings' },
-            { id: 'change_password', label: 'Change Password', icon: 'settings' },
-            { id: 'project', label: 'Project', icon: 'settings' },
-            { id: 'user', label: 'User', icon: 'settings' },
-            { id: 'vendor', label: 'Vendor', icon: 'settings' },
-            { id: 'vendor_survey', label: 'Vendor Survey', icon: 'settings' },
+            { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+            { id: 'surveys', label: 'Surveys', icon: 'assignment' },
+            { id: 'projects', label: 'Projects', icon: 'folder' },
+            { id: 'vendors', label: 'Vendors', icon: 'business' },
+            { id: 'vendorSurveys', label: 'Vendor Surveys', icon: 'poll' },
+            { id: 'user', label: 'Users', icon: 'people' },
+            { id: 'change_password', label: 'Change Password', icon: 'lock' },
           ].map((tab, index, arr) => {
             const isActive = activeTab === tab.id;
             const isLast = index === arr.length - 1;

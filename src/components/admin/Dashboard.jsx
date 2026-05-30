@@ -1,14 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../ui/Button';
 import Sidebar from './Sidebar';
 import { getUser, removeToken, removeUser } from '../../utils/storage';
-import Counter from './Counter';
-import SurveyRecord from './SurveyRecord';
+import DashboardOverview from './DashboardOverview';
+import SurveyList from './SurveyList';
+import ProjectList from './ProjectList';
+import VendorList from './VendorList';
+import VendorSurveyList from './VendorSurveyList';
 import ChangePassword from './ChangePassword';
-import Project from './Project';
-import Vendor from './Vendor';
-import VendorSurvey from './VendorSurvey';
 import User from './User';
 
 export default function Dashboard() {
@@ -27,6 +26,30 @@ export default function Dashboard() {
     setTimeout(() => {
       navigate('/');
     }, 800);
+  };
+
+  // Render content based on active tab
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <DashboardOverview />;
+      case 'surveys':
+        return <SurveyList />;
+      case 'projects':
+        return <ProjectList />;
+      case 'vendors':
+        return <VendorList />;
+      case 'vendorSurveys':
+        return <VendorSurveyList />;
+    
+      case 'changePassword':
+        return <ChangePassword />;
+     
+      case 'user':
+        return <User />;
+      default:
+        return <DashboardOverview />;
+    }
   };
 
   return (
@@ -63,35 +86,60 @@ export default function Dashboard() {
 
           {/* TAB 1: DASHBOARD OVERVIEW */}
           {activeTab === 'dashboard' && (
+            <DashboardOverview />
+          )}
+
+          {/* TAB 2: SURVEYS */}
+          {activeTab === 'surveys' && (
+            <SurveyList />
+          )}
+
+          {/* TAB 3: PROJECTS */}
+          {activeTab === 'projects' && (
+            <ProjectList />
+          )}
+
+          {/* TAB 4: VENDORS */}
+          {activeTab === 'vendors' && (
+            <VendorList />
+          )}
+
+          {/* TAB 5: VENDOR SURVEYS */}
+          {activeTab === 'vendorSurveys' && (
+            <VendorSurveyList />
+          )}
+
+          {/* TAB 6: COUNTER (OLD) */}
+          {activeTab === 'counter' && (
             <Counter />
           )}
 
-          {/* TAB 2: SURVEY RECORD */}
+          {/* TAB 7: SURVEY RECORD (OLD) */}
           {activeTab === 'survey_record' && (
             <SurveyRecord />
           )}
 
-          {/* TAB 3: CHANGE PASSWORD */}
+          {/* TAB 8: CHANGE PASSWORD */}
           {activeTab === 'change_password' && (
             <ChangePassword />
           )}
 
-          {/* TAB 4: PROJECT */}
+          {/* TAB 9: PROJECT (OLD) */}
           {activeTab === 'project' && (
             <Project />
           )}
 
-          {/* TAB 5: USER */}
+          {/* TAB 10: USER */}
           {activeTab === 'user' && (
             <User />
           )}
 
-          {/* TAB 6: VENDOR */}
+          {/* TAB 11: VENDOR (OLD) */}
           {activeTab === 'vendor' && (
             <Vendor />
           )}
 
-          {/* TAB 7: VENDOR SURVEY */}
+          {/* TAB 12: VENDOR SURVEY (OLD) */}
           {activeTab === 'vendor_survey' && (
             <VendorSurvey />
           )}
