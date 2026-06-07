@@ -65,8 +65,7 @@ const Sidebar = ({
             { id: 'projects', label: 'Projects', icon: 'folder' },
             { id: 'vendors', label: 'Vendors', icon: 'business' },
             { id: 'vendorSurveys', label: 'Vendor Surveys', icon: 'poll' },
-            { id: 'user', label: 'Users', icon: 'people' },
-            { id: 'change_password', label: 'Change Password', icon: 'lock' },
+            { id: 'user', label: 'Users', icon: 'people' }
           ].map((tab, index, arr) => {
             const isActive = activeTab === tab.id;
             const isLast = index === arr.length - 1;

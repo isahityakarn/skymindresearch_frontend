@@ -19,7 +19,7 @@ const LoginPage = () => {
     try {
 
       const loginData = await login(email, password);
-      console.log("loginData", loginData)
+      // console.log("loginData", loginData)
       setToken(loginData.data.token);
       setUser(loginData.data.user);
 

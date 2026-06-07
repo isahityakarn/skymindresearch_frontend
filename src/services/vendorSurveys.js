@@ -7,9 +7,13 @@ const getAuthConfig = () => ({
   },
 });
 
-export const getAllVendorSurveys = async () => {
+export const getAllVendorSurveys = async (params = {}) => {
   try {
-    const res = await api.get("/vendor-surveys", getAuthConfig());
+    const res = await api.get("/vendor-surveys", {
+      ...getAuthConfig(),
+      params,
+    });
+    // console.log('getAllVendorSurveys raw response:', res);
     return res.data;
   } catch (err) {
     console.error("Error fetching vendor surveys:", err);

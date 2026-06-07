@@ -13,7 +13,7 @@ export const getAllSurveys = async (params = {}) => {
       ...getAuthConfig(),
       params,
     });
-    console.log('getAllSurveys raw response:', res);
+    // console.log('getAllSurveys raw response:', res);
     // The backend returns: { success: true, message: "...", surveys: [...], pagination: {...} }
     // Axios wraps this in res.data, so we return res.data which contains surveys and pagination
     return res.data;

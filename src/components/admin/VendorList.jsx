@@ -30,7 +30,7 @@ export default function VendorList() {
     setError(null);
     try {
       const response = await getAllVendors();
-      setVendors(response.data.vendors || response.data);
+      setVendors(response.vendors || []);
     } catch (err) {
       setError(err.message);
     } finally {

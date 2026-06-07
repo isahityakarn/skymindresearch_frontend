@@ -15,7 +15,7 @@ export default function DashboardOverview() {
     setError(null);
     try {
       const response = await getDashboardStats();
-      console.log('Dashboard response:', response);
+      // console.log('Dashboard response:', response);
       
       // Ensure we have a valid response structure
       if (!response || typeof response !== 'object') {

@@ -7,7 +7,6 @@ import SurveyList from './SurveyList';
 import ProjectList from './ProjectList';
 import VendorList from './VendorList';
 import VendorSurveyList from './VendorSurveyList';
-import ChangePassword from './ChangePassword';
 import User from './User';
 
 export default function Dashboard() {
@@ -41,9 +40,7 @@ export default function Dashboard() {
         return <VendorList />;
       case 'vendorSurveys':
         return <VendorSurveyList />;
-    
-      case 'changePassword':
-        return <ChangePassword />;
+
      
       case 'user':
         return <User />;
@@ -73,9 +70,9 @@ export default function Dashboard() {
           <div>
             <h1 className="h4 text-white mb-1 fw-bold tracking-tight d-flex align-items-center gap-2">
               Sky Mind Analytical Dashboard
-              <span className="badge badge-neon-cyan fs-8 text-uppercase tracking-wider px-2 py-0.5" style={{ fontSize: '0.6rem' }}>Level 5 Access</span>
+              {/* <span className="badge badge-neon-cyan fs-8 text-uppercase tracking-wider px-2 py-0.5" style={{ fontSize: '0.6rem' }}>Level 5 Access</span> */}
             </h1>
-            <p className="text-secondary small mb-0 font-mono" style={{ fontSize: '0.75rem' }}>Decentralized Terminal. Session Cryptographically Secured.</p>
+            <p className="text-secondary small mb-0 font-mono" style={{ fontSize: '0.75rem' }}>Trusted Survey Solutions. Data Securely Collected.</p>
           </div>
         </header>
 

@@ -1,16 +1,30 @@
 import { useState, useEffect } from 'react';
-import { 
-  getAllVendorSurveys, 
-  createVendorSurvey, 
-  updateVendorSurvey, 
+import { status } from '../../services/constants';
+import {
+  getAllVendorSurveys,
+  createVendorSurvey,
+  updateVendorSurvey,
   deleteVendorSurvey,
-  updateVendorSurveyStatus 
+  updateVendorSurveyStatus
 } from '../../services/vendorSurveys';
 
 export default function VendorSurveyList() {
   const [vendorSurveys, setVendorSurveys] = useState([]);
+  const [pagination, setPagination] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [page, setPage] = useState(1);
+  const [limit] = useState(50);
+  const [filters, setFilters] = useState({
+    status: '',
+    vendor_id: '',
+    project_id: '',
+    uid: '',
+    sortBy: 'created_at',
+    sortOrder: 'DESC'
+  });
+
   const [showModal, setShowModal] = useState(false);
   const [editingSurvey, setEditingSurvey] = useState(null);
   const [formData, setFormData] = useState({
@@ -24,19 +38,32 @@ export default function VendorSurveyList() {
 
   useEffect(() => {
     fetchVendorSurveys();
-  }, []);
+  }, [page, filters]);
 
   const fetchVendorSurveys = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getAllVendorSurveys();
-      setVendorSurveys(response.data.vendorSurveys || response.data);
+      const response = await getAllVendorSurveys({ page, limit, ...filters });
+      // console.log('Vendor Survey response:', response);
+
+      // Backend returns: { success, message, vendorSurveys, pagination }
+      setVendorSurveys(response.vendorSurveys || []);
+      setPagination(response.pagination || null);
     } catch (err) {
-      setError(err.message);
+      console.error('Error fetching vendor surveys:', err);
+      setError(err.message || 'Failed to load vendor surveys');
+      setVendorSurveys([]);
+      setPagination(null);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({ ...prev, [name]: value }));
+    setPage(1);
   };
 
   const handleSubmit = async (e) => {
@@ -96,105 +123,137 @@ export default function VendorSurveyList() {
     <div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Vendor Surveys</h2>
-        <button className="btn btn-primary" onClick={() => { setEditingSurvey(null); setFormData({ vendor_id: '', project_id: '', uid: '', status: '', start_ip: '', end_ip: '' }); setShowModal(true); }}>
-          Add Vendor Survey
-        </button>
+      </div>
+
+      <div className="card mb-4">
+        <div className="card-body">
+          <div className="row g-3">
+            <div className="col-md-3">
+              <select className="form-select" name="status" value={filters.status} onChange={handleFilterChange}>
+                <option value="">All Status</option>
+                {status.map((s) => (
+                  <option key={s.name} value={s.name}>{s.name.charAt(0).toUpperCase() + s.name.slice(1)}</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-2">
+              <input type="text" className="form-control" name="vendor_id" value={filters.vendor_id} onChange={handleFilterChange} placeholder="Vendor ID" />
+            </div>
+            <div className="col-md-2">
+              <input type="text" className="form-control" name="project_id" value={filters.project_id} onChange={handleFilterChange} placeholder="Project ID" />
+            </div>
+            <div className="col-md-2">
+              <input type="text" className="form-control" name="uid" value={filters.uid} onChange={handleFilterChange} placeholder="User ID" />
+            </div>
+            <div className="col-md-3">
+              <select className="form-select" name="sortBy" value={filters.sortBy} onChange={handleFilterChange}>
+                <option value="created_at">Created Date</option>
+                <option value="id">ID</option>
+                {status.map((s) => (
+                  <option key={s.name} value={s.name}>
+                    Status: {s.name.charAt(0).toUpperCase() + s.name.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="card">
         <div className="table-responsive">
-          <table className="table table-hover mb-0">
-            <thead>
+          <table className="table table-hover mb-0" style={{ border: '1px solid black' }}>
+            <thead style={{ borderBottom: '2px solid black' }}>
               <tr>
-                <th>ID</th>
-                <th>Vendor</th>
-                <th>Project</th>
-                <th>User</th>
-                <th>Status</th>
-                <th>Start IP</th>
-                <th>End IP</th>
-                <th>Created</th>
-                <th>Actions</th>
+                <th style={{ border: '1px solid black' }}>ID</th>
+                <th style={{ border: '1px solid black' }}>Vendor</th>
+                <th style={{ border: '1px solid black' }}>Project</th>
+                <th style={{ border: '1px solid black' }}>User</th>
+                <th style={{ border: '1px solid black' }}>Status</th>
+                <th style={{ border: '1px solid black' }}>Start IP</th>
+                <th style={{ border: '1px solid black' }}>End IP</th>
+                <th style={{ border: '1px solid black' }}>Created</th>
               </tr>
             </thead>
             <tbody>
-              {vendorSurveys.map(survey => (
-                <tr key={survey.id}>
-                  <td>{survey.id}</td>
-                  <td>{survey.vendor_name || survey.vendor_id}</td>
-                  <td>{survey.project_pid || survey.project_id}</td>
-                  <td>{survey.user_name || survey.uid}</td>
-                  <td>
-                    <select className="form-select form-select-sm" value={survey.status || ''} onChange={(e) => handleStatusChange(survey.id, e.target.value)}>
-                      <option value="">Select</option>
-                      <option value="active">Active</option>
-                      <option value="completed">Completed</option>
-                      <option value="pending">Pending</option>
-                    </select>
-                  </td>
-                  <td>{survey.start_ip || '-'}</td>
-                  <td>{survey.end_ip || '-'}</td>
-                  <td>{new Date(survey.created_at).toLocaleDateString()}</td>
-                  <td>
-                    <button className="btn btn-sm btn-outline-primary me-2" onClick={() => handleEdit(survey)}>Edit</button>
-                    <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(survey.id)}>Delete</button>
-                  </td>
-                </tr>
-              ))}
+              {vendorSurveys.map(survey => {
+                // Determine status color
+                let statusColor = '';
+                let statusBgColor = '';
+                if (survey.status === 'complete') {
+                  statusColor = 'green';
+                  statusBgColor = '#d4edda';
+                } else if (survey.status === 'quotafull') {
+                  statusColor = '#856404';
+                  statusBgColor = '#fff3cd';
+                } else if (survey.status === 'terminate') {
+                  statusColor = 'red';
+                  statusBgColor = '#f8d7da';
+                }
+
+                return (
+                  <tr key={survey.id}>
+                    <td style={{ border: '1px solid black' }}>{survey.id}</td>
+                    <td style={{ border: '1px solid black' }}>{survey.vendor_name || survey.vendor_id}</td>
+                    <td style={{ border: '1px solid black' }}>{survey.project_pid || survey.project_id}</td>
+                    <td style={{ border: '1px solid black' }}>{survey.user_name || survey.uid}</td>
+                    <td style={{
+                      border: '1px solid black',
+                      backgroundColor: statusBgColor,
+                      color: statusColor,
+                      fontWeight: 'bold'
+                    }}>
+                      {survey.status}
+                    </td>
+                    <td style={{ border: '1px solid black' }}>{survey.start_ip || '-'}</td>
+                    <td style={{ border: '1px solid black' }}>{survey.end_ip || '-'}</td>
+                    <td style={{ border: '1px solid black' }}>{new Date(survey.created_at).toLocaleDateString()}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
 
-      {showModal && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">{editingSurvey ? 'Edit Vendor Survey' : 'Add Vendor Survey'}</h5>
-                <button className="btn-close" onClick={() => setShowModal(false)}></button>
-              </div>
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body">
-                  <div className="mb-3">
-                    <label className="form-label">Vendor ID</label>
-                    <input type="number" className="form-control" value={formData.vendor_id} onChange={(e) => setFormData({...formData, vendor_id: e.target.value})} required />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Project ID</label>
-                    <input type="number" className="form-control" value={formData.project_id} onChange={(e) => setFormData({...formData, project_id: e.target.value})} required />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">User ID</label>
-                    <input type="number" className="form-control" value={formData.uid} onChange={(e) => setFormData({...formData, uid: e.target.value})} required />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Status</label>
-                    <select className="form-select" value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})}>
-                      <option value="">Select</option>
-                      <option value="active">Active</option>
-                      <option value="completed">Completed</option>
-                      <option value="pending">Pending</option>
-                    </select>
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Start IP</label>
-                    <input type="text" className="form-control" value={formData.start_ip} onChange={(e) => setFormData({...formData, start_ip: e.target.value})} />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">End IP</label>
-                    <input type="text" className="form-control" value={formData.end_ip} onChange={(e) => setFormData({...formData, end_ip: e.target.value})} />
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                  <button type="submit" className="btn btn-primary">{editingSurvey ? 'Update' : 'Create'}</button>
-                </div>
-              </form>
-            </div>
+      {pagination && (
+        <div className="d-flex justify-content-between align-items-center mt-4">
+          <div>Showing {vendorSurveys.length} of {pagination.totalItems}</div>
+          <div className="d-flex gap-2 align-items-center">
+            <button
+              className="btn btn-outline-primary"
+              onClick={() => setPage(page - 1)}
+              disabled={!pagination.hasPrevPage}
+              style={{ minWidth: '100px' }}
+            >
+              Previous
+            </button>
+
+            <select
+              className="form-select"
+              value={page}
+              onChange={(e) => setPage(Number(e.target.value))}
+              style={{ minWidth: '150px', maxWidth: '200px' }}
+            >
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
+                <option key={pageNum} value={pageNum}>
+                  Page {pageNum} of {pagination.totalPages}
+                </option>
+              ))}
+            </select>
+
+            <button
+              className="btn btn-outline-primary"
+              onClick={() => setPage(page + 1)}
+              disabled={!pagination.hasNextPage}
+              style={{ minWidth: '100px' }}
+            >
+              Next
+            </button>
           </div>
         </div>
       )}
+
     </div>
   );
 }

@@ -32,7 +32,7 @@ export default function ProjectList() {
     setError(null);
     try {
       const response = await getAllProjects();
-      setProjects(response.data.projects || response.data);
+      setProjects(response.projects || []);
     } catch (err) {
       setError(err.message);
     } finally {
