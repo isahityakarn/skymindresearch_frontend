@@ -1,4 +1,5 @@
 import React from 'react';
+import { isAdmin } from '../../utils/roleHelper';
 
 const Sidebar = ({
   isSidebarCollapsed,
@@ -17,6 +18,22 @@ const Sidebar = ({
     return parts[0].slice(0, 2).toUpperCase();
   };
   const initials = getInitials(userName);
+
+  // Define menu items with role restrictions
+  const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', roles: [] }, // All users
+    { id: 'surveys', label: 'Surveys', icon: 'assignment', roles: [] }, // All users
+    { id: 'projects', label: 'Projects', icon: 'folder', roles: [1, 2] }, // Admin only
+    { id: 'vendors', label: 'Vendors', icon: 'business', roles: [] }, // All users
+    { id: 'vendorSurveys', label: 'Vendor Surveys', icon: 'poll', roles: [] }, // All users
+    { id: 'user', label: 'Users', icon: 'people', roles: [] } // All users
+  ];
+
+  // Filter menu items based on user role
+  const visibleMenuItems = menuItems.filter(item => {
+    if (item.roles.length === 0) return true; // No restriction
+    return isAdmin(); // Check if user is admin
+  });
 
   return (
     <aside
@@ -59,14 +76,7 @@ const Sidebar = ({
 
         {/* Navigation Links */}
         <nav className="d-flex flex-column border border-secondary border-opacity-25 rounded-3 overflow-hidden bg-black bg-opacity-40">
-          {[
-            { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
-            { id: 'surveys', label: 'Surveys', icon: 'assignment' },
-            { id: 'projects', label: 'Projects', icon: 'folder' },
-            { id: 'vendors', label: 'Vendors', icon: 'business' },
-            { id: 'vendorSurveys', label: 'Vendor Surveys', icon: 'poll' },
-            { id: 'user', label: 'Users', icon: 'people' }
-          ].map((tab, index, arr) => {
+          {visibleMenuItems.map((tab, index, arr) => {
             const isActive = activeTab === tab.id;
             const isLast = index === arr.length - 1;
             return (
